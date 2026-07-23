@@ -20,6 +20,7 @@ import { ErrorPage } from '@/pages/public/ErrorPage';
 import { DashboardPage } from '@/pages/app/DashboardPage';
 import { PlanTripPage } from '@/pages/app/PlanTripPage';
 import { RoutesPage } from '@/pages/app/RoutesPage';
+import { SchedulePage } from '@/pages/app/SchedulePage';
 import { NotificationsPage } from '@/pages/app/NotificationsPage';
 import { FavouritesPage } from '@/pages/app/FavouritesPage';
 import { HistoryPage } from '@/pages/app/HistoryPage';
@@ -27,6 +28,7 @@ import { ProfilePage } from '@/pages/app/ProfilePage';
 
 import { AdminUsersPage } from '@/pages/admin/AdminUsersPage';
 import { AdminIncidentsPage } from '@/pages/admin/AdminIncidentsPage';
+import { AdminEmergenciesPage } from '@/pages/admin/AdminEmergenciesPage';
 
 // Leaflet and Recharts are the heaviest deps in the bundle — split map and
 // chart-heavy pages into their own chunks so the main entry stays lean.
@@ -80,6 +82,7 @@ export const router = createBrowserRouter([
       { path: 'dashboard', element: <DashboardPage /> },
       { path: 'plan', element: <PlanTripPage /> },
       { path: 'routes', element: <RoutesPage /> },
+      { path: 'schedule', element: <SchedulePage /> },
       {
         path: 'map',
         element: (
@@ -124,6 +127,7 @@ export const router = createBrowserRouter([
       },
       { path: 'users', element: <AdminUsersPage /> },
       { path: 'incidents', element: <AdminIncidentsPage /> },
+      { path: 'emergencies', element: <AdminEmergenciesPage /> },
       {
         path: 'routes',
         element: (

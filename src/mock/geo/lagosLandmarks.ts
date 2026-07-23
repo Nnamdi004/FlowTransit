@@ -1,3 +1,5 @@
+import { haversineKm } from '@/utils/geo';
+
 export interface LagosLandmark {
   id: string;
   name: string;
@@ -40,3 +42,17 @@ export const lagosLandmarks: LagosLandmark[] = [
   { id: 'lm-badagry', name: 'Badagry', area: 'Badagry', lat: 6.4152, lng: 2.8823 },
   { id: 'lm-epe', name: 'Epe', area: 'Epe', lat: 6.5832, lng: 3.9852 },
 ];
+
+/** Nearest known Lagos area name for an arbitrary coordinate (map pin-drop, GPS, etc). */
+export function findNearestArea(lat: number, lng: number): string {
+  let best = lagosLandmarks[0]!;
+  let bestDist = Infinity;
+  for (const lm of lagosLandmarks) {
+    const dist = haversineKm({ lat, lng }, lm);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = lm;
+    }
+  }
+  return best.area;
+}

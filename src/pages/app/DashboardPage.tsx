@@ -9,9 +9,10 @@ import {
   Navigation,
   Route as RouteIcon,
 } from 'lucide-react';
-import type { FavouriteLocation, Trip } from '@/types';
+import type { FavouriteLocation, Incident, Trip } from '@/types';
 import { listTrips } from '@/services/tripService';
 import { listFavourites } from '@/services/favouriteService';
+import { listIncidents } from '@/services/incidentService';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
 import { Card } from '@/components/ui/Card';
@@ -19,6 +20,9 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { StatusPill } from '@/components/ui/StatusPill';
 import { formatFriendlyDate } from '@/utils/formatDate';
 import { formatNaira } from '@/utils/formatDistance';
+import { SafetyAlertsSummary } from '@/features/incidents/SafetyAlertsSummary';
+
+const severityRank = { high: 0, medium: 1, low: 2 };
 
 const quickActions = [
   { to: '/app/plan', label: 'Plan a trip', icon: Navigation, tone: 'bg-primary-50 text-primary-700' },
@@ -33,16 +37,22 @@ export function DashboardPage() {
   const navigate = useNavigate();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [favourites, setFavourites] = useState<FavouriteLocation[]>([]);
+  const [incidents, setIncidents] = useState<Incident[]>([]);
 
   useEffect(() => {
     if (!user) return;
     listTrips(user.id).then(setTrips);
     listFavourites(user.id).then(setFavourites);
+    listIncidents().then(setIncidents);
   }, [user]);
 
   const firstName = user?.name.split(' ')[0] ?? 'there';
   const recentTrips = trips.slice(0, 3);
   const recentNotifications = notifications.slice(0, 3);
+  const activeSafetyAlerts = incidents
+    .filter((i) => i.status !== 'resolved')
+    .sort((a, b) => severityRank[a.severity] - severityRank[b.severity])
+    .slice(0, 3);
 
   return (
     <div className="flex flex-col gap-6">
@@ -70,6 +80,8 @@ export function DashboardPage() {
           </motion.div>
         ))}
       </div>
+
+      <SafetyAlertsSummary incidents={activeSafetyAlerts} />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">

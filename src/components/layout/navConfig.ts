@@ -1,12 +1,14 @@
 import {
   AlertTriangle,
   Bell,
+  CalendarClock,
   Heart,
   History,
   LayoutDashboard,
   Map,
   Navigation,
   Route,
+  Siren,
   UserCircle,
   Users,
   type LucideIcon,
@@ -22,6 +24,7 @@ export const appNavItems: NavItem[] = [
   { to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/app/plan', label: 'Plan Trip', icon: Navigation },
   { to: '/app/routes', label: 'Routes', icon: Route },
+  { to: '/app/schedule', label: 'Schedule', icon: CalendarClock },
   { to: '/app/map', label: 'Map', icon: Map },
   { to: '/app/incidents', label: 'Incidents', icon: AlertTriangle },
   { to: '/app/notifications', label: 'Notifications', icon: Bell },
@@ -43,4 +46,5 @@ export const adminNavItems: NavItem[] = [
   { to: '/admin/users', label: 'Users', icon: Users },
   { to: '/admin/incidents', label: 'Incidents', icon: AlertTriangle },
   { to: '/admin/routes', label: 'Routes', icon: Route },
+  { to: '/admin/emergencies', label: 'Emergencies', icon: Siren },
 ];

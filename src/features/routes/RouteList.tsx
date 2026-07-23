@@ -7,10 +7,11 @@ import { RouteOff } from 'lucide-react';
 interface RouteListProps {
   routes: RouteLine[];
   stops: Stop[];
+  unsafeAreas?: Set<string>;
   isLoading: boolean;
 }
 
-export function RouteList({ routes, stops, isLoading }: RouteListProps) {
+export function RouteList({ routes, stops, unsafeAreas, isLoading }: RouteListProps) {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-3">
@@ -34,7 +35,7 @@ export function RouteList({ routes, stops, isLoading }: RouteListProps) {
   return (
     <div className="flex flex-col gap-3">
       {routes.map((route) => (
-        <RouteCard key={route.id} route={route} stops={stops} />
+        <RouteCard key={route.id} route={route} stops={stops} unsafeAreas={unsafeAreas} />
       ))}
     </div>
   );

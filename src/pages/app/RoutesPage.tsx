@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { RouteLine, Stop } from '@/types';
+import type { Incident, RouteLine, Stop } from '@/types';
 import { listRoutes } from '@/services/routeService';
 import { listStops } from '@/services/stopService';
+import { listIncidents } from '@/services/incidentService';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { SearchInput } from '@/components/ui/SearchInput';
@@ -11,18 +12,27 @@ import { useDebounce } from '@/hooks/useDebounce';
 export function RoutesPage() {
   const [routes, setRoutes] = useState<RouteLine[]>([]);
   const [stops, setStops] = useState<Stop[]>([]);
+  const [incidents, setIncidents] = useState<Incident[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [mode, setMode] = useState<'all' | 'road' | 'ferry'>('all');
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 200);
 
   useEffect(() => {
-    Promise.all([listRoutes(), listStops()]).then(([routesData, stopsData]) => {
-      setRoutes(routesData);
-      setStops(stopsData);
-      setIsLoading(false);
-    });
+    Promise.all([listRoutes(), listStops(), listIncidents()]).then(
+      ([routesData, stopsData, incidentsData]) => {
+        setRoutes(routesData);
+        setStops(stopsData);
+        setIncidents(incidentsData);
+        setIsLoading(false);
+      },
+    );
   }, []);
+
+  const unsafeAreas = useMemo(
+    () => new Set(incidents.filter((i) => i.status !== 'resolved').map((i) => i.area)),
+    [incidents],
+  );
 
   const filtered = useMemo(() => {
     return routes.filter((route) => {
@@ -53,7 +63,7 @@ export function RoutesPage() {
         />
         <SearchInput value={query} onChange={setQuery} placeholder="Search routes or operators…" className="sm:w-72" />
       </div>
-      <RouteList routes={filtered} stops={stops} isLoading={isLoading} />
+      <RouteList routes={filtered} stops={stops} unsafeAreas={unsafeAreas} isLoading={isLoading} />
     </div>
   );
 }

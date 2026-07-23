@@ -11,8 +11,7 @@ import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { MapView } from '@/components/map/MapView';
 import { ImageUpload } from '@/components/form/ImageUpload';
-import { lagosLandmarks } from '@/mock/geo/lagosLandmarks';
-import { haversineKm } from '@/utils/geo';
+import { findNearestArea } from '@/mock/geo/lagosLandmarks';
 import type { NewIncidentInput } from '@/types';
 
 const incidentSchema = z.object({
@@ -25,19 +24,6 @@ const incidentSchema = z.object({
 type IncidentFormValues = z.infer<typeof incidentSchema>;
 
 const LAGOS_CENTER: [number, number] = [6.505, 3.42];
-
-function nearestArea(lat: number, lng: number): string {
-  let best = lagosLandmarks[0]!;
-  let bestDist = Infinity;
-  for (const lm of lagosLandmarks) {
-    const dist = haversineKm({ lat, lng }, lm);
-    if (dist < bestDist) {
-      bestDist = dist;
-      best = lm;
-    }
-  }
-  return best.area;
-}
 
 function LocationPicker({
   position,
@@ -76,7 +62,7 @@ export function IncidentForm({ onSubmit, onCancel }: IncidentFormProps) {
       ...values,
       lat: position[0],
       lng: position[1],
-      area: nearestArea(position[0], position[1]),
+      area: findNearestArea(position[0], position[1]),
       imageUrl,
     });
   };
@@ -120,7 +106,7 @@ export function IncidentForm({ onSubmit, onCancel }: IncidentFormProps) {
           </MapView>
         </div>
         <p className="mt-1.5 inline-flex items-center gap-1 text-xs text-ink-subtle">
-          <MapPin className="size-3.5" /> {nearestArea(position[0], position[1])}
+          <MapPin className="size-3.5" /> {findNearestArea(position[0], position[1])}
         </p>
       </FormField>
 

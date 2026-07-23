@@ -1,5 +1,5 @@
 import { format, subDays, eachDayOfInterval } from 'date-fns';
-import type { Incident, RouteLine, Trip, User } from '@/types';
+import type { Incident, RouteLine, SOSAlert, Trip, User } from '@/types';
 import { apiClient } from './apiClient';
 
 interface OverviewResponse {
@@ -8,10 +8,12 @@ interface OverviewResponse {
   openIncidents: number;
   totalRoutes: number;
   totalTrips: number;
+  activeSOSAlerts: number;
   incidents: Incident[];
   users: User[];
   routes: RouteLine[];
   trips: Trip[];
+  sosAlerts: SOSAlert[];
 }
 
 export interface OverviewStats {
@@ -20,6 +22,7 @@ export interface OverviewStats {
   openIncidents: number;
   totalRoutes: number;
   totalTrips: number;
+  activeSOSAlerts: number;
 }
 
 export interface TrendPoint {
@@ -39,9 +42,9 @@ async function fetchOverview(): Promise<OverviewResponse> {
 }
 
 export async function getOverviewStats(): Promise<OverviewStats> {
-  const { totalUsers, activeUsers, openIncidents, totalRoutes, totalTrips } =
+  const { totalUsers, activeUsers, openIncidents, totalRoutes, totalTrips, activeSOSAlerts } =
     await fetchOverview();
-  return { totalUsers, activeUsers, openIncidents, totalRoutes, totalTrips };
+  return { totalUsers, activeUsers, openIncidents, totalRoutes, totalTrips, activeSOSAlerts };
 }
 
 export async function getIncidentTrend(days = 14): Promise<TrendPoint[]> {

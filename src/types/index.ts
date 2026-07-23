@@ -6,3 +6,5 @@ export * from './incident';
 export * from './notification';
 export * from './favourite';
 export * from './trip';
+export * from './schedule';
+export * from './sos';

@@ -5,8 +5,11 @@ import type {
   Incident,
   IncidentStatus,
   NewIncidentInput,
+  NewSOSInput,
   RouteLine,
   Session,
+  SOSAlert,
+  SOSStatus,
   Trip,
   User,
 } from '@/types';
@@ -239,6 +242,45 @@ mock.onPatch(/\/trips\/.+/).reply((config) => {
   return trip ? [200, trip] : [404, { message: 'Trip not found.' }];
 });
 
+// ---- Schedules ----
+mock.onGet('/schedules').reply((config) => {
+  const routeId = (config.params ?? {}).routeId as string | undefined;
+  const schedules = db.getSchedules();
+  return [200, routeId ? schedules.filter((s) => s.routeId === routeId) : schedules];
+});
+
+// ---- SOS Alerts ----
+mock.onGet('/sos').reply((config) => {
+  const userId = (config.params ?? {}).userId as string | undefined;
+  const alerts = db.getSOSAlerts();
+  return [200, userId ? alerts.filter((a) => a.userId === userId) : alerts];
+});
+
+mock.onPost('/sos').reply((config) => {
+  const { userId, ...payload } = JSON.parse(config.data) as NewSOSInput & { userId: string };
+  const reporter = db.findUserById(userId);
+  const now = new Date().toISOString();
+  const alert: SOSAlert = {
+    ...payload,
+    id: `sos-${uuid()}`,
+    userId,
+    userName: reporter?.name ?? 'Unknown commuter',
+    userPhone: reporter?.phone,
+    status: 'active',
+    createdAt: now,
+    updatedAt: now,
+  };
+  db.insertSOSAlert(alert);
+  return [201, alert];
+});
+
+mock.onPatch(/\/sos\/.+\/status/).reply((config) => {
+  const id = config.url!.split('/')[2]!;
+  const { status } = JSON.parse(config.data) as { status: SOSStatus };
+  const alert = db.updateSOSAlert(id, { status, updatedAt: new Date().toISOString() });
+  return alert ? [200, alert] : [404, { message: 'SOS alert not found.' }];
+});
+
 // ---- Admin: Users ----
 mock.onGet('/admin/users').reply(() => [200, db.getUsers().map(toPublicUser)]);
 
@@ -255,6 +297,7 @@ mock.onGet('/admin/analytics/overview').reply(() => {
   const incidents = db.getIncidents();
   const routes = db.getRoutes();
   const trips = db.getTrips();
+  const sosAlerts = db.getSOSAlerts();
 
   return [
     200,
@@ -264,10 +307,12 @@ mock.onGet('/admin/analytics/overview').reply(() => {
       openIncidents: incidents.filter((i) => i.status !== 'resolved').length,
       totalRoutes: routes.length,
       totalTrips: trips.length,
+      activeSOSAlerts: sosAlerts.filter((a) => a.status !== 'resolved').length,
       incidents,
       users,
       routes,
       trips,
+      sosAlerts,
     },
   ];
 });

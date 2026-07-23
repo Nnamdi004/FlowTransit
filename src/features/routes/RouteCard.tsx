@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, Clock, MapPin, Ship, Bus } from 'lucide-react';
+import { AlertTriangle, ChevronDown, Clock, MapPin, Ship, Bus } from 'lucide-react';
 import type { RouteLine, Stop } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -7,11 +7,20 @@ import { cn } from '@/utils/cn';
 import { formatNaira } from '@/utils/formatDistance';
 import { RouteDetailPanel } from './RouteDetailPanel';
 
-export function RouteCard({ route, stops }: { route: RouteLine; stops: Stop[] }) {
+interface RouteCardProps {
+  route: RouteLine;
+  stops: Stop[];
+  unsafeAreas?: Set<string>;
+}
+
+export function RouteCard({ route, stops, unsafeAreas }: RouteCardProps) {
   const [expanded, setExpanded] = useState(false);
 
+  const routeStops = stops.filter((s) => route.stopIds.includes(s.id));
+  const hasSafetyAlert = unsafeAreas ? routeStops.some((s) => unsafeAreas.has(s.area)) : false;
+
   return (
-    <Card padding="none" hover className="overflow-hidden">
+    <Card padding="none" hover className={cn('overflow-hidden', hasSafetyAlert && 'ring-1 ring-danger/30')}>
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
@@ -28,6 +37,11 @@ export function RouteCard({ route, stops }: { route: RouteLine; stops: Stop[] })
               )}
               {route.mode === 'road' ? 'Road / BRT' : 'Ferry'}
             </Badge>
+            {hasSafetyAlert && (
+              <Badge color="danger">
+                <AlertTriangle className="size-3.5" /> Safety alert
+              </Badge>
+            )}
             <span className="text-xs text-ink-subtle">{route.operator}</span>
           </div>
           <p className="font-semibold text-ink">{route.name}</p>

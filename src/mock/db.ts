@@ -3,6 +3,8 @@ import type {
   FavouriteLocation,
   Incident,
   RouteLine,
+  ScheduleEntry,
+  SOSAlert,
   Stop,
   Trip,
   User,
@@ -14,9 +16,11 @@ import { incidentsSeed } from './seed/incidents.seed';
 import { notificationsSeed } from './seed/notifications.seed';
 import { favouritesSeed } from './seed/favourites.seed';
 import { tripsSeed } from './seed/trips.seed';
+import { schedulesSeed } from './seed/schedules.seed';
+import { sosSeed } from './seed/sos.seed';
 
 const STORAGE_KEY = 'flowtransit_db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 interface Store {
   version: number;
@@ -27,6 +31,8 @@ interface Store {
   notifications: AppNotification[];
   favourites: FavouriteLocation[];
   trips: Trip[];
+  schedules: ScheduleEntry[];
+  sosAlerts: SOSAlert[];
 }
 
 function seedStore(): Store {
@@ -39,6 +45,8 @@ function seedStore(): Store {
     notifications: structuredClone(notificationsSeed),
     favourites: structuredClone(favouritesSeed),
     trips: structuredClone(tripsSeed),
+    schedules: structuredClone(schedulesSeed),
+    sosAlerts: structuredClone(sosSeed),
   };
 }
 
@@ -210,4 +218,32 @@ export function updateTrip(id: string, patch: Partial<Trip>): Trip | undefined {
   Object.assign(trip, patch);
   persist();
   return trip;
+}
+
+// ---- Schedules ----
+export function getSchedules(): ScheduleEntry[] {
+  return store.schedules;
+}
+
+// ---- SOS Alerts ----
+export function getSOSAlerts(): SOSAlert[] {
+  return store.sosAlerts;
+}
+
+export function findSOSAlertById(id: string): SOSAlert | undefined {
+  return store.sosAlerts.find((s) => s.id === id);
+}
+
+export function insertSOSAlert(alert: SOSAlert): SOSAlert {
+  store.sosAlerts.unshift(alert);
+  persist();
+  return alert;
+}
+
+export function updateSOSAlert(id: string, patch: Partial<SOSAlert>): SOSAlert | undefined {
+  const alert = findSOSAlertById(id);
+  if (!alert) return undefined;
+  Object.assign(alert, patch);
+  persist();
+  return alert;
 }

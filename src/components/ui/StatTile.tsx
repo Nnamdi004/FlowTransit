@@ -8,13 +8,14 @@ interface StatTileProps {
   value: string | number;
   icon: ReactNode;
   delta?: { value: string; direction: 'up' | 'down' };
-  tone?: 'primary' | 'secondary' | 'accent';
+  tone?: 'primary' | 'secondary' | 'accent' | 'danger';
 }
 
 const toneClasses = {
   primary: 'bg-primary-50 text-primary-700',
   secondary: 'bg-secondary-50 text-secondary-700',
   accent: 'bg-accent-50 text-accent-700',
+  danger: 'bg-red-50 text-danger',
 };
 
 export function StatTile({ label, value, icon, delta, tone = 'primary' }: StatTileProps) {

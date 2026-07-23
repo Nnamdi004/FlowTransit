@@ -38,8 +38,8 @@ export function AdminDashboardPage() {
       {stats ? (
         <OverviewStats stats={stats} />
       ) : (
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+          {[1, 2, 3, 4, 5].map((i) => (
             <Skeleton key={i} className="h-24 rounded-2xl" />
           ))}
         </div>
